@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Activity, Heart, Zap } from 'lucide-react';
 
-// **HARDCODED KEY**
+// HARDCODED KEY
 const GROQ_API_KEY = "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";
 
 export default function VitalityHealthBot() {
@@ -83,7 +83,7 @@ export default function VitalityHealthBot() {
     setUserData(prev => ({ ...prev, age }));
     addMessage('user', ageRanges.find(r => r.value === age).label);
     setShowButtons(false);
-    setTimeout(() => {
+    setTimeout(() => {.
       setCollectionStep('gender');
       setShowButtons(true);
       addMessage('assistant', getPromptForStep('gender'));
@@ -163,12 +163,13 @@ export default function VitalityHealthBot() {
       if (result.choices && result.choices.length > 0) {
         return result.choices[0].message.content;
       } else {
-        console.error('API Error or no candidates:', result);
+        // **UPDATED LOGGING**
+        console.error('API Error from Groq:', result.error ? result.error.message : result);
         return "I'm having trouble generating your personalized health plan right now. (No response from AI) 🔄";
       }
 
     } catch (error) {
-      console.error('API Error:', error);
+      console.error('Fetch Error:', error);
       return "I'm having trouble generating your personalized health plan right now. Please try again! 🔄";
     }
   };
@@ -181,7 +182,7 @@ export default function VitalityHealthBot() {
     setIsLoading(true);
 
     try {
-      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
+      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${data.sheightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
       const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -205,7 +206,8 @@ export default function VitalityHealthBot() {
       if (result.choices && result.choices.length > 0) {
         assistantResponse = result.choices[0].message.content;
       } else {
-         console.error('API Error or no candidates:', result);
+         // **UPDATED LOGGING**
+         console.error('API Error from Groq:', result.error ? result.error.message : result);
          assistantResponse = "I'm having trouble with that question right now. (No response from AI) 🔄";
       }
 
@@ -215,6 +217,7 @@ export default function VitalityHealthBot() {
       }]);
 
     } catch (error) {
+      console.error('Fetch Error:', error);
       setMessages(prev => [...prev, {
          role: 'assistant',
          content: "Oops! Something went wrong. Please try again! 😊"
