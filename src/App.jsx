@@ -151,7 +151,8 @@ export default function VitalityHealthBot() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama3-8b-8192',
+          // **MODEL UPDATED HERE**
+          model: 'llama3-70b-8192',
           messages: [
             { role: 'user', content: prompt }
           ]
@@ -192,7 +193,8 @@ export default function VitalityHealthBot() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama3-8b-8192',
+          // **MODEL UPDATED HERE**
+          model: 'llama3-70b-8192',
           messages: [
             { role: 'user', content: conversationPrompt }
           ]
@@ -262,7 +264,7 @@ export default function VitalityHealthBot() {
               <p className="text-sm text-gray-600 flex items-center gap-1">
                 <Zap className="w-3 h-3 text-yellow-500" />
                 Your AI Health Assistant
-              </p> {/* <-- **TYPO FIXED HERE** (was </tranp>) */}
+              </p>
             </div>
           </div>
           <Heart className="w-6 h-6 text-rose-500 animate-pulse" />
@@ -418,7 +420,7 @@ export default function VitalityHealthBot() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.gtarget.value)}
+              onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about health, fitness, or nutrition..."
               className="flex-1 px-5 py-4 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-lg text-gray-800 placeholder-gray-400"
