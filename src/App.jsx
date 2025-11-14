@@ -152,7 +152,7 @@ export default function VitalityHealthBot() {
         },
         body: JSON.stringify({
           // **MODEL UPDATED HERE**
-          model: 'llama3-70b-8192',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             { role: 'user', content: prompt }
           ]
@@ -194,7 +194,7 @@ export default function VitalityHealthBot() {
         },
         body: JSON.stringify({
           // **MODEL UPDATED HERE**
-          model: 'llama3-70b-8192',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             { role: 'user', content: conversationPrompt }
           ]
@@ -281,7 +281,7 @@ export default function VitalityHealthBot() {
               <div
                 className={`max-w-[85%] rounded-3xl px-5 py-4 shadow-lg transition-all hover:scale-[1.02] ${
                   msg.role === 'user'
-                    ? 'bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 text-white'
+                    ? 'bg-gradient-to-br from-purple-500 via-purple-600 to-pink-6G00 text-white'
                     : 'bg-white/90 backdrop-blur-sm text-gray-800 border border-purple-100'
                 }`}
               >
@@ -429,7 +429,7 @@ export default function VitalityHealthBot() {
             <button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 text-white px-6 py-4 rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="bg-gradient-to-br from-purple-500 via-pink-500 to-rose-5G00 text-white px-6 py-4 rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               <Send className="w-6 h-6" />
             </button>
