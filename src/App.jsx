@@ -140,7 +140,8 @@ export default function VitalityHealthBot() {
 
     const prompt = `You are Vitality, a friendly and modern health assistant. Provide personalized health advice based on:- Age: ${data.age} years- Gender: ${data.gender}- Height: ${data.heightFeet}'${data.heightInches}" (${heightInCm.toFixed(0)} cm)- Weight: ${data.weight} kg- BMI: ${bmi}Provide a comprehensive health analysis in a conversational, engaging tone:1. **Your Health Overview** - Brief BMI interpretation with encouraging words2. **Daily Routine** - Morning and evening routines tailored to their age3. **Workout Plan** - Specific exercises with duration (suitable for their fitness level)4. **Nutrition Guide** - Meal ideas, portions, and what to avoid5. **Lifestyle Tips** - Sleep schedule, hydration, stress management6. **Mental Wellness** - Mindfulness practices, hobbies, social connectionsUse emojis naturally. Be motivating and practical. Keep it modern and friendly, not medical or boring. Make it actionable with specific examples.`;
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // **FIX 1 Applied**
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
       const response = await fetch(API_URL, {
@@ -184,7 +185,8 @@ export default function VitalityHealthBot() {
     try {
       const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+      // **FIX 1 Applied**
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -209,6 +211,7 @@ export default function VitalityHealthBot() {
         assistantResponse = result.candidates[0].content.parts[0].text;
       } else {
          console.error('API Error or no candidates:', result);
+         assistantResponse = "I'm having trouble with that question right now. (No response from AI) 🔄";
       }
 
       setMessages(prev => [...prev, {
@@ -419,7 +422,7 @@ export default function VitalityHealthBot() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.tube.target.value)}
+              onChange={(e) => setInput(e.target.value)} {/* **FIX 2 Applied** */}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about health, fitness, or nutrition..."
               className="flex-1 px-5 py-4 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-lg text-gray-800 placeholder-gray-400"
