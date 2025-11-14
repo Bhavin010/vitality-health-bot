@@ -83,7 +83,6 @@ export default function VitalityHealthBot() {
     setUserData(prev => ({ ...prev, age }));
     addMessage('user', ageRanges.find(r => r.value === age).label);
     setShowButtons(false);
-    // **FIX 1: Removed the extra period here**
     setTimeout(() => {
       setCollectionStep('gender');
       setShowButtons(true);
@@ -182,7 +181,6 @@ export default function VitalityHealthBot() {
     setIsLoading(true);
 
     try {
-      // **FIX 2: Corrected 'sheightInches' to 'heightInches'**
       const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
       const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -264,7 +262,7 @@ export default function VitalityHealthBot() {
               <p className="text-sm text-gray-600 flex items-center gap-1">
                 <Zap className="w-3 h-3 text-yellow-500" />
                 Your AI Health Assistant
-              </tranp>
+              </p> {/* <-- **TYPO FIXED HERE** (was </tranp>) */}
             </div>
           </div>
           <Heart className="w-6 h-6 text-rose-500 animate-pulse" />
@@ -420,7 +418,7 @@ export default function VitalityHealthBot() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => setInput(e.gtarget.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about health, fitness, or nutrition..."
               className="flex-1 px-5 py-4 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-lg text-gray-800 placeholder-gray-400"
