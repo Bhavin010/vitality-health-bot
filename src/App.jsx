@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Activity, Heart, Zap } from 'lucide-react';
 
 export default function VitalityHealthBot() {
+  const GEMINI_API_KEY = 'AIzaSyDalMp-OAEDkFkeTIUctlnYAUsGRhAoBqw';
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -39,12 +41,10 @@ export default function VitalityHealthBot() {
     { label: '56-65', value: 60 },
     { label: '66+', value: 70 }
   ];
-
   const heightOptions = {
     feet: [4, 5, 6, 7],
     inches: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   };
-
   const weightRanges = [
     { label: '40-50 kg', value: 45 },
     { label: '51-60 kg', value: 55 },
@@ -116,14 +116,14 @@ export default function VitalityHealthBot() {
     addMessage('user', weightRanges.find(r => r.value === weight).label);
     setShowButtons(false);
     setCollectionStep('complete');
-    
+
     setTimeout(async () => {
       addMessage('assistant', "Perfect! Let me create your personalized health plan... ⏳");
       setIsLoading(true);
-      
+
       const finalUserData = { ...userData, weight };
       const analysis = await getHealthAnalysis(finalUserData);
-      
+
       setTimeout(() => {
         setIsLoading(false);
         addMessage('assistant', analysis);
@@ -137,42 +137,37 @@ export default function VitalityHealthBot() {
   const getHealthAnalysis = async (data) => {
     const heightInCm = (data.heightFeet * 30.48) + (data.heightInches * 2.54);
     const bmi = (data.weight / ((heightInCm / 100) ** 2)).toFixed(1);
-    
-    const prompt = `You are Vitality, a friendly and modern health assistant. Provide personalized health advice based on:
-- Age: ${data.age} years
-- Gender: ${data.gender}
-- Height: ${data.heightFeet}'${data.heightInches}" (${heightInCm.toFixed(0)} cm)
-- Weight: ${data.weight} kg
-- BMI: ${bmi}
 
-Provide a comprehensive health analysis in a conversational, engaging tone:
+    const prompt = `You are Vitality, a friendly and modern health assistant. Provide personalized health advice based on:- Age: ${data.age} years- Gender: ${data.gender}- Height: ${data.heightFeet}'${data.heightInches}" (${heightInCm.toFixed(0)} cm)- Weight: ${data.weight} kg- BMI: ${bmi}Provide a comprehensive health analysis in a conversational, engaging tone:1. **Your Health Overview** - Brief BMI interpretation with encouraging words2. **Daily Routine** - Morning and evening routines tailored to their age3. **Workout Plan** - Specific exercises with duration (suitable for their fitness level)4. **Nutrition Guide** - Meal ideas, portions, and what to avoid5. **Lifestyle Tips** - Sleep schedule, hydration, stress management6. **Mental Wellness** - Mindfulness practices, hobbies, social connectionsUse emojis naturally. Be motivating and practical. Keep it modern and friendly, not medical or boring. Make it actionable with specific examples.`;
 
-1. **Your Health Overview** - Brief BMI interpretation with encouraging words
-2. **Daily Routine** - Morning and evening routines tailored to their age
-3. **Workout Plan** - Specific exercises with duration (suitable for their fitness level)
-4. **Nutrition Guide** - Meal ideas, portions, and what to avoid
-5. **Lifestyle Tips** - Sleep schedule, hydration, stress management
-6. **Mental Wellness** - Mindfulness practices, hobbies, social connections
-
-Use emojis naturally. Be motivating and practical. Keep it modern and friendly, not medical or boring. Make it actionable with specific examples.`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
-          messages: [
-            { role: 'user', content: prompt }
+          contents: [
+            {
+              parts: [
+                { "text": prompt }
+              ]
+            }
           ]
         })
       });
 
       const result = await response.json();
-      return result.content[0].text;
+      
+      if (result.candidates && result.candidates.length > 0) {
+        return result.candidates[0].content.parts[0].text;
+      } else {
+        console.error('API Error or no candidates:', result);
+        return "I'm having trouble generating your personalized health plan right now. (No response from AI) 🔄";
+      }
+
     } catch (error) {
       console.error('API Error:', error);
       return "I'm having trouble generating your personalized health plan right now. Please try again! 🔄";
@@ -181,47 +176,52 @@ Use emojis naturally. Be motivating and practical. Keep it modern and friendly, 
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
-
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const heightInCm = (userData.heightFeet * 30.48) + (userData.heightInches * 2.54);
-      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:
-- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kg
+      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
+      
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
-User's question: ${input}
-
-Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
-
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [
-            { role: 'user', content: conversationPrompt }
+          contents: [
+            {
+              parts: [
+                { "text": conversationPrompt }
+              ]
+            }
           ]
         })
       });
 
       const result = await response.json();
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: result.content[0].text 
-      }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "Oops! Something went wrong. Please try again! 😊" 
-      }]);
-    }
+      
+      let assistantResponse = "Oops! Something went wrong. Please try again! 😊";
+      if (result.candidates && result.candidates.length > 0) {
+        assistantResponse = result.candidates[0].content.parts[0].text;
+      } else {
+         console.error('API Error or no candidates:', result);
+      }
 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: assistantResponse
+      }]);
+
+    } catch (error) {
+      setMessages(prev => [...prev, {
+         role: 'assistant',
+         content: "Oops! Something went wrong. Please try again! 😊"
+       }]);
+    }
     setIsLoading(false);
   };
 
@@ -249,7 +249,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
         <div className="absolute top-40 right-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute -bottom-32 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
-
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-xl border-b border-purple-200 px-6 py-4 shadow-lg relative z-10">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
@@ -270,7 +269,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
           <Heart className="w-6 h-6 text-rose-500 animate-pulse" />
         </div>
       </div>
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 relative z-10">
         <div className="max-w-4xl mx-auto space-y-4">
@@ -296,7 +294,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
               </div>
             </div>
           ))}
-          
           {/* Age Selection Buttons */}
           {showButtons && collectionStep === 'age' && (
             <div className="flex justify-start animate-fade-in">
@@ -315,7 +312,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
               </div>
             </div>
           )}
-
           {/* Gender Selection Buttons */}
           {showButtons && collectionStep === 'gender' && (
             <div className="flex justify-start animate-fade-in">
@@ -343,7 +339,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
               </div>
             </div>
           )}
-
           {/* Height Selection */}
           {showButtons && collectionStep === 'height' && (
             <div className="flex justify-start animate-fade-in">
@@ -385,7 +380,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
               </div>
             </div>
           )}
-
           {/* Weight Selection Buttons */}
           {showButtons && collectionStep === 'weight' && (
             <div className="flex justify-start animate-fade-in">
@@ -404,7 +398,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
               </div>
             </div>
           )}
-          
           {isLoading && (
             <div className="flex justify-start animate-fade-in">
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100">
@@ -419,7 +412,6 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
           <div ref={messagesEndRef} />
         </div>
       </div>
-
       {/* Input */}
       {collectionStep === 'complete' && (
         <div className="bg-white/90 backdrop-blur-xl border-t border-purple-200 px-4 py-5 shadow-lg relative z-10">
@@ -427,7 +419,7 @@ Provide a helpful, friendly response related to health, fitness, nutrition, or w
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => setInput(e.tube.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about health, fitness, or nutrition..."
               className="flex-1 px-5 py-4 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-lg text-gray-800 placeholder-gray-400"
@@ -462,6 +454,5 @@ style.textContent = `
   }
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
-  }
-`;
+  }`;
 document.head.appendChild(style);
