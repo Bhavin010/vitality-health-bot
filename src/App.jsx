@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Activity, Heart, Zap } from 'lucide-react';
 
-// Reads the variable from your Vercel settings
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// **CHANGE 1: Read the new Vercel variable**
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 export default function VitalityHealthBot() {
   const [messages, setMessages] = useState([
@@ -141,29 +141,31 @@ export default function VitalityHealthBot() {
 
     const prompt = `You are Vitality, a friendly and modern health assistant. Provide personalized health advice based on:- Age: ${data.age} years- Gender: ${data.gender}- Height: ${data.heightFeet}'${data.heightInches}" (${heightInCm.toFixed(0)} cm)- Weight: ${data.weight} kg- BMI: ${bmi}Provide a comprehensive health analysis in a conversational, engaging tone:1. **Your Health Overview** - Brief BMI interpretation with encouraging words2. **Daily Routine** - Morning and evening routines tailored to their age3. **Workout Plan** - Specific exercises with duration (suitable for their fitness level)4. **Nutrition Guide** - Meal ideas, portions, and what to avoid5. **Lifestyle Tips** - Sleep schedule, hydration, stress management6. **Mental Wellness** - Mindfulness practices, hobbies, social connectionsUse emojis naturally. Be motivating and practical. Keep it modern and friendly, not medical or boring. Make it actionable with specific examples.`;
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+    // **CHANGE 2: Groq API Endpoint**
+    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
+          // **CHANGE 3: Authorization header**
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
           'Content-Type': 'application/json',
         },
+        // **CHANGE 4: OpenAI-compatible body**
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { "text": prompt }
-              ]
-            }
+          model: 'llama3-8b-8192', // Fast model from Groq
+          messages: [
+            { role: 'user', content: prompt }
           ]
         })
       });
 
       const result = await response.json();
       
-      if (result.candidates && result.candidates.length > 0) {
-        return result.candidates[0].content.parts[0].text;
+      // **CHANGE 5: New response parsing**
+      if (result.choices && result.choices.length > 0) {
+        return result.choices[0].message.content;
       } else {
         console.error('API Error or no candidates:', result);
         return "I'm having trouble generating your personalized health plan right now. (No response from AI) 🔄";
@@ -185,20 +187,21 @@ export default function VitalityHealthBot() {
     try {
       const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+      // **CHANGE 2: Groq API Endpoint**
+      const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
+          // **CHANGE 3: Authorization header**
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
           'Content-Type': 'application/json',
         },
+        // **CHANGE 4: OpenAI-compatible body**
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { "text": conversationPrompt }
-              ]
-            }
+          model: 'llama3-8b-8192',
+          messages: [
+            { role: 'user', content: conversationPrompt }
           ]
         })
       });
@@ -206,8 +209,9 @@ export default function VitalityHealthBot() {
       const result = await response.json();
       
       let assistantResponse = "Oops! Something went wrong. Please try again! 😊";
-      if (result.candidates && result.candidates.length > 0) {
-        assistantResponse = result.candidates[0].content.parts[0].text;
+      // **CHANGE 5: New response parsing**
+      if (result.choices && result.choices.length > 0) {
+        assistantResponse = result.choices[0].message.content;
       } else {
          console.error('API Error or no candidates:', result);
          assistantResponse = "I'm having trouble with that question right now. (No response from AI) 🔄";
