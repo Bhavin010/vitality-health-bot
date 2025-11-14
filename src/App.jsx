@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Activity, Heart, Zap } from 'lucide-react';
 
-export default function VitalityHealthBot() {
-  const GEMINI_API_KEY = 'AIzaSyDalMp-OAEDkFkeTIUctlnYAUsGRhAoBqw';
+// **FIX 1: Use VITE prefix for environment variables**
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
+export default function VitalityHealthBot() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -140,7 +141,6 @@ export default function VitalityHealthBot() {
 
     const prompt = `You are Vitality, a friendly and modern health assistant. Provide personalized health advice based on:- Age: ${data.age} years- Gender: ${data.gender}- Height: ${data.heightFeet}'${data.heightInches}" (${heightInCm.toFixed(0)} cm)- Weight: ${data.weight} kg- BMI: ${bmi}Provide a comprehensive health analysis in a conversational, engaging tone:1. **Your Health Overview** - Brief BMI interpretation with encouraging words2. **Daily Routine** - Morning and evening routines tailored to their age3. **Workout Plan** - Specific exercises with duration (suitable for their fitness level)4. **Nutrition Guide** - Meal ideas, portions, and what to avoid5. **Lifestyle Tips** - Sleep schedule, hydration, stress management6. **Mental Wellness** - Mindfulness practices, hobbies, social connectionsUse emojis naturally. Be motivating and practical. Keep it modern and friendly, not medical or boring. Make it actionable with specific examples.`;
 
-    // **FIX 1 Applied**
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
@@ -166,7 +166,7 @@ export default function VitalityHealthBot() {
         return result.candidates[0].content.parts[0].text;
       } else {
         console.error('API Error or no candidates:', result);
-        return "I'm having trouble generating your personalized health plan right now. (No response from AI) 🔄";
+        return "I'm having new trouble generating your personalized health plan right now. (No response from AI) 🔄";
       }
 
     } catch (error) {
@@ -185,7 +185,6 @@ export default function VitalityHealthBot() {
     try {
       const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
-      // **FIX 1 Applied**
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
 
       const response = await fetch(API_URL, {
@@ -249,213 +248,4 @@ export default function VitalityHealthBot() {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute -bottom-32 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-purple-200 px-6 py-4 shadow-lg relative z-10">
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 p-3 rounded-2xl shadow-lg animate-pulse">
-              <Activity className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
-                Vitality
-              </h1>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-yellow-500" />
-                Your AI Health Assistant
-              </p>
-            </div>
-          </div>
-          <Heart className="w-6 h-6 text-rose-500 animate-pulse" />
-        </div>
-      </div>
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 relative z-10">
-        <div className="max-w-4xl mx-auto space-y-4">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
-            >
-              <div
-                className={`max-w-[85%] rounded-3xl px-5 py-4 shadow-lg transition-all hover:scale-[1.02] ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 text-white'
-                    : 'bg-white/90 backdrop-blur-sm text-gray-800 border border-purple-100'
-                }`}
-              >
-                {msg.role === 'assistant' && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
-                    <span className="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Vitality AI</span>
-                  </div>
-                )}
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
-              </div>
-            </div>
-          ))}
-          {/* Age Selection Buttons */}
-          {showButtons && collectionStep === 'age' && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100">
-                <div className="flex flex-wrap gap-2">
-                  {ageRanges.map((range) => (
-                    <button
-                      key={range.value}
-                      onClick={() => handleAgeSelect(range.value)}
-                      className="px-5 py-2.5 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-xl hover:scale-105 font-medium"
-                    >
-                      {range.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Gender Selection Buttons */}
-          {showButtons && collectionStep === 'gender' && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100">
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => handleGenderSelect('Male')}
-                    className="px-8 py-3 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-xl hover:scale-105 font-medium"
-                  >
-                    👨 Male
-                  </button>
-                  <button
-                    onClick={() => handleGenderSelect('Female')}
-                    className="px-8 py-3 bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all shadow-md hover:shadow-xl hover:scale-105 font-medium"
-                  >
-                    👩 Female
-                  </button>
-                  <button
-                    onClick={() => handleGenderSelect('Other')}
-                    className="px-8 py-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all shadow-md hover:shadow-xl hover:scale-105 font-medium"
-                  >
-                    🌟 Other
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Height Selection */}
-          {showButtons && collectionStep === 'height' && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100 max-w-md">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Select Feet:</p>
-                <div className="flex gap-2 mb-4">
-                  {heightOptions.feet.map((feet) => (
-                    <button
-                      key={feet}
-                      onClick={() => {
-                        setUserData(prev => ({ ...prev, heightFeet: feet }));
-                      }}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                        userData.heightFeet === feet
-                          ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg scale-105'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {feet}'
-                    </button>
-                  ))}
-                </div>
-                {userData.heightFeet && (
-                  <>
-                    <p className="text-sm font-semibold text-gray-700 mb-3">Select Inches:</p>
-                    <div className="grid grid-cols-6 gap-2">
-                      {heightOptions.inches.map((inches) => (
-                        <button
-                          key={inches}
-                          onClick={() => handleHeightSelect(userData.heightFeet, inches)}
-                          className="px-3 py-2 bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all shadow-md hover:shadow-lg hover:scale-105 font-medium text-sm"
-                        >
-                          {inches}"
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-          {/* Weight Selection Buttons */}
-          {showButtons && collectionStep === 'weight' && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100">
-                <div className="flex flex-wrap gap-2">
-                  {weightRanges.map((range) => (
-                    <button
-                      key={range.value}
-                      onClick={() => handleWeightSelect(range.value)}
-                      className="px-5 py-2.5 bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-xl hover:from-rose-600 hover:to-pink-700 transition-all shadow-md hover:shadow-xl hover:scale-105 font-medium"
-                    >
-                      {range.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          {isLoading && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl px-5 py-4 shadow-xl border border-purple-100">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" />
-                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-3 h-3 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-      {/* Input */}
-      {collectionStep === 'complete' && (
-        <div className="bg-white/90 backdrop-blur-xl border-t border-purple-200 px-4 py-5 shadow-lg relative z-10">
-          <div className="max-w-4xl mx-auto flex gap-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)} {/* **FIX 2 Applied** */}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me anything about health, fitness, or nutrition..."
-              className="flex-1 px-5 py-4 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-lg text-gray-800 placeholder-gray-400"
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 text-white px-6 py-4 rounded-2xl hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              <Send className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Add this to your global CSS or in a style tag
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-fade-in {
-    animation: fade-in 0.5s ease-out;
-  }`;
-document.head.appendChild(style);
+        <div className="absolute top-40 right-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur
