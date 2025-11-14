@@ -83,7 +83,8 @@ export default function VitalityHealthBot() {
     setUserData(prev => ({ ...prev, age }));
     addMessage('user', ageRanges.find(r => r.value === age).label);
     setShowButtons(false);
-    setTimeout(() => {.
+    // **FIX 1: Removed the extra period here**
+    setTimeout(() => {
       setCollectionStep('gender');
       setShowButtons(true);
       addMessage('assistant', getPromptForStep('gender'));
@@ -163,7 +164,6 @@ export default function VitalityHealthBot() {
       if (result.choices && result.choices.length > 0) {
         return result.choices[0].message.content;
       } else {
-        // **UPDATED LOGGING**
         console.error('API Error from Groq:', result.error ? result.error.message : result);
         return "I'm having trouble generating your personalized health plan right now. (No response from AI) 🔄";
       }
@@ -182,7 +182,8 @@ export default function VitalityHealthBot() {
     setIsLoading(true);
 
     try {
-      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${data.sheightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
+      // **FIX 2: Corrected 'sheightInches' to 'heightInches'**
+      const conversationPrompt = `You are Vitality, a friendly health assistant. The user has provided their health data:- Age: ${userData.age}, Gender: ${userData.gender}, Height: ${userData.heightFeet}'${userData.heightInches}", Weight: ${userData.weight}kgUser's question: ${input}Provide a helpful, friendly response related to health, fitness, nutrition, or wellness. Be conversational and supportive. Use emojis occasionally.`;
       
       const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -206,7 +207,6 @@ export default function VitalityHealthBot() {
       if (result.choices && result.choices.length > 0) {
         assistantResponse = result.choices[0].message.content;
       } else {
-         // **UPDATED LOGGING**
          console.error('API Error from Groq:', result.error ? result.error.message : result);
          assistantResponse = "I'm having trouble with that question right now. (No response from AI) 🔄";
       }
@@ -264,7 +264,7 @@ export default function VitalityHealthBot() {
               <p className="text-sm text-gray-600 flex items-center gap-1">
                 <Zap className="w-3 h-3 text-yellow-500" />
                 Your AI Health Assistant
-              </p>
+              </tranp>
             </div>
           </div>
           <Heart className="w-6 h-6 text-rose-500 animate-pulse" />
